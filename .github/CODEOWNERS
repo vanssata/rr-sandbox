@@ -18,3 +18,5 @@ opencode.json @vanssata
 .github/** @vanssata
 .env* @vanssata
 .github/workflows/** @vanssata
+go.mod @vanssata
+go.sum @vanssata

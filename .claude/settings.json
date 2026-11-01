@@ -1,0 +1,122 @@
+{
+  "permissions": {
+    "deny": [
+      "Edit(/riskrails.yaml)",
+      "Edit(/**/riskrails.yaml)",
+      "Edit(/.rr/**)",
+      "Edit(/.claude/**)",
+      "Edit(/.codex/**)",
+      "Edit(/.gemini/**)",
+      "Edit(/.cursor/**)",
+      "Edit(/.kiro/**)",
+      "Edit(/.opencode/**)",
+      "Edit(/opencode.json)",
+      "Edit(/**/opencode.json)",
+      "Edit(/.agents/**)",
+      "Edit(/.githooks/**)",
+      "Edit(/.mcp.json)",
+      "Edit(/**/.mcp.json)",
+      "Edit(/.git/**)",
+      "Edit(/.github/**)",
+      "Edit(/.env*)",
+      "Edit(/**/.env*)",
+      "Edit(/.github/workflows/**)",
+      "Edit(/go.mod)",
+      "Edit(/**/go.mod)",
+      "Edit(/go.sum)",
+      "Edit(/**/go.sum)",
+      "Edit(/.git/config)",
+      "Edit(/.git/refs/remotes/**)",
+      "Edit(~/.config/riskrails/**)",
+      "Edit(~/.cache/riskrails/**)",
+      "Read(/.env*)",
+      "Read(/**/.env*)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.config/riskrails/**)",
+      "Read(~/.cache/riskrails/**)",
+      "Bash(git push --force*)",
+      "Bash(git push * main)",
+      "Bash(rm -rf /)"
+    ],
+    "ask": [
+      "Bash(git push*)",
+      "Bash(git commit*)",
+      "Bash(git tag*)",
+      "Bash(gh *)"
+    ],
+    "allow": [
+      "Bash(go build ./...)",
+      "Bash(go vet ./...)",
+      "Bash(go test *)",
+      "Bash(gofmt -l *)",
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "mcp__rr__*"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "rr guard --runtime claude --event PreToolUse",
+            "timeout": 10,
+            "onFailure": "block"
+          }
+        ]
+      }
+    ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": false,
+    "allowUnsandboxedCommands": false,
+    "filesystem": {
+      "denyRead": [
+        ".env*",
+        "**/.env*",
+        "~/.ssh/**",
+        "~/.aws/**",
+        "~/.config/riskrails/**",
+        "~/.cache/riskrails/**"
+      ],
+      "denyWrite": [
+        "riskrails.yaml",
+        "**/riskrails.yaml",
+        ".rr/**",
+        ".claude/**",
+        ".codex/**",
+        ".gemini/**",
+        ".cursor/**",
+        ".kiro/**",
+        ".opencode/**",
+        "opencode.json",
+        "**/opencode.json",
+        ".agents/**",
+        ".githooks/**",
+        ".mcp.json",
+        "**/.mcp.json",
+        ".git/**",
+        ".github/**",
+        ".env*",
+        "**/.env*",
+        ".github/workflows/**",
+        "go.mod",
+        "**/go.mod",
+        "go.sum",
+        "**/go.sum",
+        ".git/config",
+        ".git/refs/remotes/**",
+        "~/.config/riskrails/**",
+        "~/.cache/riskrails/**"
+      ]
+    }
+  },
+  "enabledMcpjsonServers": [
+    "rr"
+  ]
+}
