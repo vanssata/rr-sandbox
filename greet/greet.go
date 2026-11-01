@@ -5,3 +5,8 @@ package greet
 func Hello(name string) string {
 	return "Hello, " + name
 }
+
+// Farewell returns a goodbye for name.
+func Farewell(name string) string {
+	return "Goodbye, " + name
+}
