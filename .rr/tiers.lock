@@ -1,0 +1,10 @@
+{
+  "claude": {
+    "models": { "BALANCED": "sonnet", "FAST": "haiku", "STRONG": "opus" },
+    "ladder": {}
+  },
+  "codex": {
+    "models": { "BALANCED": "gpt-6.1-sol", "FAST": "gpt-6-luna", "STRONG": "gpt-6-astra" },
+    "ladder": {}
+  }
+}

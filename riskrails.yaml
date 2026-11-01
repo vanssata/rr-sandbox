@@ -1,0 +1,75 @@
+# riskrails.yaml — sandbox for real runs of the rr runner (wave 4.2), schema 1
+schema: 1
+project:
+  name: rr-sandbox
+  stack: [go]
+  default_branch: main
+  runtimes: [claude, codex]
+
+risk:
+  axes:
+    scope:         { measured: refs, bands: [0, 5] }
+    behaviour:     { declared: true, keywords: [token, credential, hook] }
+    reversibility: { measured: paths }
+    domain:        { measured: paths, declared: true }
+    novelty:       { declared: true, manifest_floor: 1 }
+    coverage:      { measured: tests, test_globs: ["**/*_test.go"] }
+  modes:
+    light:     { max: 2 }
+    guarded:   { min: 3, max: 7 }
+    full:      { min: 8 }
+    programme: { trigger: [spec, ">1 session", "files > 25"] }
+  hard_floors:
+    - { axis: reversibility, value: 2, mode: full }
+    - { axis: domain,        value: 2, mode: full, review: security }
+    - { both: [reversibility, domain], value: 2, mode: full_irreversible }
+  hot_paths: []
+  domain: {}
+  reversibility:
+    needs_step: []
+    irreversible: []
+    irreversible_content: []
+  rescore: { axes: [reversibility, domain], when: [verify, close], direction: up_only }
+  policy_file_weight: { behaviour: 2, domain: 2 }
+
+models:
+  tiers_allowed: [FAST, BALANCED, STRONG]
+  by_runtime:
+    claude: { FAST: [haiku], BALANCED: [sonnet], STRONG: [opus] }
+    codex:  { FAST: [gpt-6-luna], BALANCED: [gpt-6.1-sol], STRONG: [gpt-6-astra] }
+  budgets:
+    light: 600k
+
+autonomy:
+  ceiling: L2
+  by_mode: { light: L2, guarded: L2, full: L1, full_irreversible: L0 }
+  output: pr_only
+  kill_switch:
+    remote_file: ".rr/HALT"
+    poll_seconds: 60
+    on_read_error: halt
+  unattended:
+    container: required
+    max_wall_minutes: 20
+    max_tasks_per_day: 6
+
+enforcement:
+  protected_paths: [".env*", ".github/workflows/**", "riskrails.yaml", "go.mod", "go.sum"]
+  secret_reads: [".env*", "~/.ssh/**", "~/.aws/**"]
+  commands:
+    deny:  ["git push --force*", "git push * main", "rm -rf /"]
+    ask:   ["git push*", "git commit*", "git tag*", "gh *"]
+    allow: ["go build ./...", "go vet ./...", "go test *", "gofmt -l *", "git status", "git diff*", "git log*"]
+    parser: ast
+    unlisted: ask
+  egress:
+    allow: []
+    deny_default: true
+  fail_closed: true
+  sandbox:
+    required_from: L2
+
+verify:
+  adapters:
+    - { name: go, cmd: "go test ./..." }
+  full_run_when: [lockfile, ".github/**", "uncovered_file", "mode>=full", close]
